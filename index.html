@@ -5,39 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shift Swap</title>
     <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
 
-.shift {
-            display: inline-block;
+        .header {
+            text-align: center;
+            padding: 20px;
+            background-color: #fff;
+            border-bottom: 1px solid #ddd;
         }
-        .title {
-            display: inline-block;
-        }
-        .radio-container {
+
+        #fetchAccountsBtn {
             margin-top: 10px;
         }
-        /* Modal Styles */
+
         .modal {
-            display: none; /* Hidden by default */
+            display: none;
             position: fixed;
-            z-index: 1; /* Sit on top */
+            z-index: 1;
             left: 0;
             top: 0;
-            width: 500 px; /* Full width */
-            height: 150 px; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgb(0,0,0); /* Fallback color */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
             padding-top: 60px;
+            box-sizing: border-box;
         }
 
         .modal-content {
             background-color: #fefefe;
             margin: 5% auto;
             padding: 20px;
-            width: 500 px; /* Full width */
-            height: 150 px; /* Full height */
             border: 1px solid #888;
-            width: 80%; /* Could be more or less, depending on screen size */
+            width: 80%;
+            max-width: 600px;
+            box-sizing: border-box;
         }
 
         .close {
@@ -54,17 +60,73 @@
             cursor: pointer;
         }
 
+        .radio-container {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9f9f9; /* Light background for better visibility */
+            border-radius: 4px; /* Rounded corners */
+        }
+
+        .radio-container input[type="radio"] {
+            margin-right: 10px; /* Space between radio button and label */
+        }
+
+        .radio-container label {
+            display: block;
+            margin-bottom: 10px; /* Space between each record */
+        }
+
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            margin: 0 10px;
+        }
+
+        #searchBox {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        #submitBtn {
+            display: none; /* Initially hidden */
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #submitBtn:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
-    <p class="title">Select the shift in the modal&#58;</p>
-    <button id="fetchAccountsBtn">Click here</button> 
+    <div class="header">
+        <p>Select the temp in the modal&#58;</p>
+        <button id="fetchAccountsBtn">Click here</button>
+    </div>
 
-    <!-- The Modal -->
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
+            <input type="text" id="searchBox" placeholder="Search by name...">
             <div class="radio-container" id="accountRadioContainer"></div>
+            <div class="pagination" id="paginationControls">
+                <button id="prevPageBtn">Previous</button>
+                <button id="nextPageBtn">Next</button>
+            </div>
+            <button id="submitBtn">Submit</button> <!-- Submit button added here -->
         </div>
     </div>
 
