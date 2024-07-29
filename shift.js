@@ -1,52 +1,64 @@
-console.log("Script started");
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM fully loaded and parsed");
 
-ZOHO.embeddedApp.on("PageLoad", function(data) {
-    console.log("Page loaded, Zoho Embedded App SDK initialized");
+    ZOHO.embeddedApp.on("PageLoad", function(data) {
+        console.log("Page loaded, Zoho Embedded App SDK initialized");
 
-    document.getElementById('fetchAccountsBtn').addEventListener('click', function() {
-        console.log("Fetch temp button clicked");
+        document.getElementById('fetchAccountsBtn').addEventListener('click', function() {
+            console.log("Fetch temp button clicked");
 
-        ZOHO.CRM.API.getAllRecords({
-            Entity: "Leads",
-            sort_order: "asc",
-            per_page: 200
-        }).then(function(response) {
-            console.log("API response received:", response);
+            ZOHO.CRM.API.getAllRecords({
+                Entity: "Leads",
+                sort_order: "asc",
+                per_page: 200
+            }).then(function(response) {
+                console.log("API response received:", response);
 
-            if (response.data && response.data.length > 0) {
-                const temp = response.data.map(temp => ({
-                    id: temp.id,
-                    First_Name: temp.First_Name
-                }));
-                console.log("Temps data processed:", temp);
+                if (response.data && response.data.length > 0) {
+                    const temp = response.data.map(temp => ({
+                        id: temp.id,
+                        First_Name: temp.First_Name
+                    }));
+                    console.log("Temps data processed:", temp);
 
-                populateDropdown(temp);
-            } else {
-                console.log("No temp data found");
-            }
-        }).catch(function(error) {
-            console.error("Error fetching temp data:", error);
+                    populateRadioButtons(temp);
+                } else {
+                    console.log("No temp data found");
+                }
+            }).catch(function(error) {
+                console.error("Error fetching temp data:", error);
+            });
         });
     });
-});
 
-function populateDropdown(temp) {
-    const dropdown = document.getElementById('accountDropdown');
-    dropdown.innerHTML = ''; // Clear existing options
-    console.log("Dropdown cleared");
+    function populateRadioButtons(temp) {
+        const container = document.getElementById('accountRadioContainer');
+        if (!container) {
+            console.error("Radio container element not found");
+            return;
+        }
+        
+        container.innerHTML = ''; // Clear existing options
+        console.log("Radio container cleared");
 
-    temp.forEach(temp => {
-        const option = document.createElement('option');
-        option.value = temp.id;
-        option.textContent = temp.First_Name + " " + temp.id;
-        dropdown.appendChild(option);
+        temp.forEach(temp => {
+            const label = document.createElement('label');
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'account';
+            radio.value = temp.id;
+            label.appendChild(radio);
+            label.appendChild(document.createTextNode(temp.First_Name + " " + temp.id));
+            container.appendChild(label);
+            container.appendChild(document.createElement('br')); // For better spacing
+        });
+        console.log("Radio buttons populated with temp");
+    }
+
+    // Initialize the Zoho Embedded App SDK and add a callback for initialization success
+    ZOHO.embeddedApp.init().then(function() {
+        console.log("Zoho Embedded App SDK initialization completed");
+    }).catch(function(error) {
+        console.error("Zoho Embedded App SDK initialization error:", error);
     });
-    console.log("Dropdown populated with temp");
-}
-
-// Initialize the Zoho Embedded App SDK and add a callback for initialization success
-ZOHO.embeddedApp.init().then(function() {
-    console.log("Zoho Embedded App SDK initialization completed");
-}).catch(function(error) {
-    console.error("Zoho Embedded App SDK initialization error:", error);
 });
