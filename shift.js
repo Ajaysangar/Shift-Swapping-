@@ -1,6 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM fully loaded and parsed");
 
+    // Get modal elements
+    var modal = document.getElementById('myModal');
+    var span = document.getElementsByClassName('close')[0];
+
     ZOHO.embeddedApp.on("PageLoad", function(data) {
         console.log("Page loaded, Zoho Embedded App SDK initialized");
 
@@ -28,7 +32,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }).catch(function(error) {
                 console.error("Error fetching temp data:", error);
             });
+
+            // Display the modal
+            modal.style.display = "block";
         });
+
+        // Close the modal when the user clicks on <span> (x)
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // Close the modal when the user clicks anywhere outside of the modal
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
     });
 
     function populateRadioButtons(temp) {
