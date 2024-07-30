@@ -92,7 +92,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         Name: shift.Name || '',
                         Start_Date_and_Work_Start_Time: shift.Start_Date_and_Work_Start_Time || '',
                         End_Date_and_Work_End_Time: shift.End_Date_and_Work_End_Time || '',
-                        Days_in_the_Week: shift.Days_in_the_Week || ''
+                        Days_in_the_Week: shift.Days_in_the_Week || '',
+                        Schedule_For_Temp: shift.Schedule_For_Temp.name || ''
                     }));
                     console.log("Shifts data processed:", shiftData);
 
@@ -251,6 +252,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${shift.Name}</td>
+                <td>${shift.Schedule_For_Temp}</td>
                 <td>${shift.Start_Date_and_Work_Start_Time}</td>
                 <td>${shift.End_Date_and_Work_End_Time}</td>
                 <td>${shift.Days_in_the_Week}</td>
