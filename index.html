@@ -42,8 +42,13 @@
             padding: 20px;
             border: 1px solid #888;
             width: 80%;
-            max-width: 600px;
+            max-width: 800px;
             box-sizing: border-box;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
         }
 
         .close {
@@ -60,20 +65,21 @@
             cursor: pointer;
         }
 
-        .radio-container {
+        .radio-container, .shift-container {
             margin-top: 10px;
             padding: 10px;
-            background-color: #f9f9f9; /* Light background for better visibility */
-            border-radius: 4px; /* Rounded corners */
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            overflow-y: auto;
         }
 
         .radio-container input[type="radio"] {
-            margin-right: 10px; /* Space between radio button and label */
+            margin-right: 10px;
         }
 
-        .radio-container label {
+        .radio-container label, .shift-row {
             display: block;
-            margin-bottom: 10px; /* Space between each record */
+            margin-bottom: 10px;
         }
 
         .pagination {
@@ -85,7 +91,11 @@
             margin: 0 10px;
         }
 
-        #searchBox {
+        .pagination .prev-page-btn {
+            display: inline-block;
+        }
+
+        #searchBox, #searchBoxShift {
             width: 100%;
             padding: 10px;
             margin-bottom: 20px;
@@ -94,8 +104,8 @@
             box-sizing: border-box;
         }
 
-        #submitBtn {
-            display: none; /* Initially hidden */
+        #submitBtn, #submitShiftBtn {
+            display: none;
             margin-top: 20px;
             padding: 10px 20px;
             font-size: 16px;
@@ -106,27 +116,127 @@
             cursor: pointer;
         }
 
-        #submitBtn:hover {
+        #submitBtn:hover, #submitShiftBtn:hover {
             background-color: #45a049;
+        }
+
+        .shift-row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+            padding: 5px 0;
+        }
+
+        .shift-row div {
+            flex: 1;
+            text-align: left;
+        }
+
+        .modal-header button {
+            margin-top: 10px;
+        }
+
+        .multi-select-btn {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .multi-select-btn:hover {
+            background-color: #0b79d0;
+        }
+
+        .shift-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .shift-table th, .shift-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .shift-table th {
+            background-color: #f2f2f2;
+        }
+
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            margin: 10px;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <p>Select the temp in the modal&#58;</p>
+        <p>Select the temp&#58;</p>
         <button id="fetchAccountsBtn">Click here</button>
     </div>
 
-    <div id="myModal" class="modal">
+    <!-- Modal for Select Action -->
+    <div id="buttonsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <p>Select Action:</p>
+                <button id="swapShiftsBtn" class="multi-select-btn">Swap Shifts</button>
+                <button id="swapTempsBtn" class="multi-select-btn">Swap Temps</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Temp Selection -->
+    <div id="tempModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <input type="text" id="searchBox" placeholder="Search by name...">
-            <div class="radio-container" id="accountRadioContainer"></div>
-            <div class="pagination" id="paginationControls">
-                <button id="prevPageBtn">Previous</button>
-                <button id="nextPageBtn">Next</button>
+            <div class="modal-header">
+                <p>Select the temp&#58;</p>
+                <input type="text" id="searchBox" placeholder="Search by name...">
+                <div class="radio-container" id="accountRadioContainer"></div>
+                <div class="pagination">
+                    <button id="prevPageBtn">Previous</button>
+                    <button id="nextPageBtn">Next</button>
+                </div>
+                <button id="submitBtn">Submit</button>
             </div>
-            <button id="submitBtn">Submit</button> <!-- Submit button added here -->
+        </div>
+    </div>
+
+    <!-- Modal for Shift Selection -->
+    <div id="shiftModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-header">
+                <p>Select the shifts&#58;</p>
+                <input type="text" id="searchBoxShift" placeholder="Search by shift name...">
+                <table id="shiftTable" class="shift-table">
+                    <thead>
+                        <tr>
+                            <th>Shift Name</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Repeat</th>
+                            <th>Select</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shiftContainer"></tbody>
+                </table>
+                <div class="pagination">
+                    <button id="prevShiftPageBtn">Previous</button>
+                    <button id="nextShiftPageBtn">Next</button>
+                </div>
+                <button id="submitShiftBtn">Submit</button>
+            </div>
         </div>
     </div>
 
