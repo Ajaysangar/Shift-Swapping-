@@ -41,14 +41,24 @@
             margin: 5% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 80%;
-            max-width: 800px;
+            width: 90%;
+            max-width: 900px;
             box-sizing: border-box;
         }
 
         .modal-header {
-            text-align: center;
+            text-align: left; /* Align header text to the left */
             margin-bottom: 20px;
+        }
+
+        .modal-header p {
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .modal-header button {
+            display: inline-block;
+            margin: 10px 5px;
         }
 
         .close {
@@ -65,7 +75,8 @@
             cursor: pointer;
         }
 
-        .radio-container, .shift-container {
+        .radio-container {
+            text-align: left; /* Align radio button container content to the left */
             margin-top: 10px;
             padding: 10px;
             background-color: #f9f9f9;
@@ -77,7 +88,7 @@
             margin-right: 10px;
         }
 
-        .radio-container label, .shift-row {
+        .radio-container label {
             display: block;
             margin-bottom: 10px;
         }
@@ -91,12 +102,8 @@
             margin: 0 10px;
         }
 
-        .pagination .prev-page-btn {
-            display: inline-block;
-        }
-
         #searchBox, #searchBoxShift {
-            width: 100%;
+            width: calc(100% - 22px); /* Adjust for padding and border */
             padding: 10px;
             margin-bottom: 20px;
             border: 1px solid #ddd;
@@ -132,10 +139,6 @@
             text-align: left;
         }
 
-        .modal-header button {
-            margin-top: 10px;
-        }
-
         .multi-select-btn {
             display: block;
             margin: 10px auto;
@@ -155,25 +158,18 @@
         .shift-table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 20px;
         }
 
         .shift-table th, .shift-table td {
             padding: 10px;
             border: 1px solid #ddd;
             text-align: left;
+            word-break: break-word; /* Ensure long text wraps correctly */
         }
 
         .shift-table th {
             background-color: #f2f2f2;
-        }
-
-        .pagination {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .pagination button {
-            margin: 10px;
         }
     </style>
 </head>
@@ -223,6 +219,7 @@
                     <thead>
                         <tr>
                             <th>Shift Name</th>
+                            <th>Temp Name</th>
                             <th>Start Date</th>
                             <th>End Date</th>
                             <th>Repeat</th>
