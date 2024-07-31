@@ -170,12 +170,31 @@
             color: white;
             background-color: #277de7;
         }
+        .Click-inital-button {
+              
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color:  #0771c8;
+            color: rgb(240, 240, 240);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+
+            
+        }
+        .Click-inital-button:hover
+        {
+            background-color:  #2288e7;   
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <p><b>Select the temp&#58;</b></p>
-        <button id="fetchAccountsBtn">Click here</button>
+        <p><b>Do you wanna Swap? Click below&#58;</b></p>
+        <button class = "Click-inital-button" id="fetchAccountsBtn"> <b>Swap here</b></button>
     </div>
 
     <!-- Modal for Select Action -->
