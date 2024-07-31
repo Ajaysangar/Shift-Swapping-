@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var selectedShiftIds = [];
     var currentPage = 1;
     var recordsPerPage = 10;
+    let maxSelections = 2;
 
     function closeModals() {
         if (buttonsModal) buttonsModal.style.display = "none";
@@ -257,24 +258,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td>${shift.End_Date_and_Work_End_Time}</td>
                 <td>${shift.Days_in_the_Week}</td>
                 <td>
-                    <input type="checkbox" name="shift" value="${shift.id}" />
+                    <input type="checkbox" name="shift" value="${shift.id}" class="shift-checkbox" />
                 </td>
             `;
-
-            row.querySelector('input[type="checkbox"]').addEventListener('change', function() {
-                const shiftId = this.value;
-                if (this.checked) {
-                    selectedShiftIds.push(shiftId);
-                } else {
-                    selectedShiftIds = selectedShiftIds.filter(id => id !== shiftId);
-                }
-                toggleSubmitShiftButtonVisibility();
-            });
 
             container.appendChild(row);
         });
 
+        document.querySelectorAll('.shift-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', handleShiftSelection);
+        });
+
         console.log("Shift data populated");
+    }
+
+    function handleShiftSelection(event) {
+        const checkbox = event.target;
+        const shiftId = checkbox.value;
+
+        if (checkbox.checked) {
+            if (selectedShiftIds.length >= maxSelections) {
+                checkbox.checked = false;
+                alert('You can only select up to two shifts.');
+            } else {
+                selectedShiftIds.push(shiftId);
+            }
+        } else {
+            selectedShiftIds = selectedShiftIds.filter(id => id !== shiftId);
+        }
+
+        toggleSubmitShiftButtonVisibility();
     }
 
     function toggleSubmitButtonVisibility() {
@@ -284,7 +297,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function toggleSubmitShiftButtonVisibility() {
         const submitShiftBtn = document.getElementById('submitShiftBtn');
-        submitShiftBtn.style.display = selectedShiftIds.length > 0 ? 'block' : 'none';
+        submitShiftBtn.style.display = selectedShiftIds.length === maxSelections ? 'block' : 'none';
     }
 
     ZOHO.embeddedApp.init().then(function() {
