@@ -144,6 +144,21 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("Previous Page button for shift not found");
     }
 
+    // Function to display the success message modal
+    function showSuccessModal(message) {
+        var successModal = document.getElementById('successModal');
+        var successMessage = document.getElementById('successMessage');
+
+        if (successMessage) {
+            successMessage.textContent = message;
+        }
+
+        if (successModal) {
+            successModal.style.display = "block";
+        }
+    }
+
+    // Update the code where you handle the successful shift swap
     if (document.getElementById('submitShiftBtn')) {
         document.getElementById('submitShiftBtn').addEventListener('click', function() {
             if (selectedShiftIds.length === 2) {
@@ -152,30 +167,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (selectedShifts.length === 2) {
                     const [shift1, shift2] = selectedShifts;
-    
+
                     // Log both Shift ID and Schedule_For_Temp.id for each selected shift
                     console.log(`Shifts to swap:`);
                     console.log(`Shift 1 ID: ${shift1.id}, Temp ID: ${shift1.Schedule_For_Temp ? shift1.Schedule_For_Temp.id : 'N/A'}`);
                     console.log(`Shift 2 ID: ${shift2.id}, Temp ID: ${shift2.Schedule_For_Temp ? shift2.Schedule_For_Temp.id : 'N/A'}`);
-    
+
                     // Perform swap
                     const tempId1 = shift1.Schedule_For_Temp ? shift1.Schedule_For_Temp.id : null;
                     const tempId2 = shift2.Schedule_For_Temp ? shift2.Schedule_For_Temp.id : null;
-    
+
                     if (tempId1 === null || tempId2 === null) {
-                        alert("Both selected shifts must have associated temps.");
+                        showSuccessModal("Both selected shifts must have associated temps.");
                         return;
                     }
-    
+
                     // Prepare data for updating
                     const updates = [
                         { id: shift1.id, Schedule_For_Temp: { id: tempId2 } },
                         { id: shift2.id, Schedule_For_Temp: { id: tempId1 } }
                     ];
-    
+
                     // Log the data being sent to API
                     console.log("Data to be updated:", updates);
-    
+
                     Promise.all(updates.map(update => {
                         console.log("Updating shift:", update); // Log each update
                         return ZOHO.CRM.API.updateRecord({
@@ -195,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }))
                     .then(responses => {
                         console.log("All updates successful:", responses);
-                        alert("Shifts Swapped Successfully.");
+                        showSuccessModal("Shifts Swapped Successfully.");
                         closeModals();
                     })
                     .catch(function(error) {
@@ -203,18 +218,23 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (error && error.data) {
                             console.error("Detailed error data:", error.data);
                         }
-                        alert("Failed to update shifts. Please try again.");
+                        showSuccessModal("Failed to update shifts. Please try again.");
                     });
                 } else {
-                    alert("Please select exactly two shifts for swapping.");
+                    showSuccessModal("Please select exactly two shifts for swapping.");
                 }
             } else {
-                alert("Please select exactly two shifts.");
+                showSuccessModal("Please select exactly two shifts.");
             }
         });
     } else {
         console.error("Submit button for shift not found");
     }
+
+    // Add an event listener to close the success modal
+    document.querySelector('#successModal .close').addEventListener('click', function() {
+        document.getElementById('successModal').style.display = 'none';
+    });
 
     if (document.getElementById('searchBox')) {
         document.getElementById('searchBox').addEventListener('input', function(event) {
@@ -235,6 +255,16 @@ document.addEventListener('DOMContentLoaded', function() {
             displayShiftPage(1, filteredData); // Reset to the first page of filtered results
         });
     }
+    if (document.getElementById('searchBoxTemp')) {
+        document.getElementById('searchBoxTemp').addEventListener('input', function(event) {
+            const searchQuery = event.target.value.toLowerCase();
+            const filteredData = shiftData.filter(shift => 
+                (shift.Schedule_For_Temp && shift.Schedule_For_Temp.name ? shift.Schedule_For_Temp.name : '').toLowerCase().includes(searchQuery)
+            );
+            displayShiftPage(1, filteredData); // Reset to the first page of filtered results
+        });
+    }
+    
 
     function displayTempPage(page, data = tempData) {
         const container = document.getElementById('accountRadioContainer');
