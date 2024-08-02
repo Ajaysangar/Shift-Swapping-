@@ -49,13 +49,11 @@
         .modal-header {
             text-align: center;
             margin-bottom: 20px;
-            
         }
 
         .modal-header button {
             display: inline-block;
             margin: 10px 5px;
-
         }
 
         .close {
@@ -99,9 +97,8 @@
         }
 
         #searchBox, #searchBoxShift {
-            width: calc(100% - 22px); /* Adjust for padding and border */
+            width: calc(50% - 12px); /* Adjust for padding and spacing */
             padding: 10px;
-            margin-bottom: 20px;
             border: 1px solid #ddd;
             border-radius: 4px;
             box-sizing: border-box;
@@ -155,7 +152,6 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
-           
         }
 
         .shift-table th, .shift-table td {
@@ -163,38 +159,50 @@
             border: 1px solid #ddd;
             text-align: left;
             word-break: break-word; /* Ensure long text wraps correctly */
-           
         }
 
         .shift-table th {
             color: white;
             background-color: #277de7;
         }
+
         .Click-inital-button {
-              
             display: block;
             margin: 10px auto;
             padding: 10px 20px;
             font-size: 16px;
-            background-color:  #0771c8;
+            background-color: #0771c8;
             color: rgb(240, 240, 240);
             border: none;
             border-radius: 4px;
             cursor: pointer;
-
-            
         }
-        .Click-inital-button:hover
-        {
-            background-color:  #2288e7;   
+
+        .Click-inital-button:hover {
+            background-color: #2288e7;
             box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .search-container input[type="text"] {
+            width: calc(50% - 12px); /* Adjust for padding and spacing */
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
         }
     </style>
 </head>
 <body>
     <div class="header">
         <p><b>Do you wanna Swap? Click below&#58;</b></p>
-        <button class = "Click-inital-button" id="fetchAccountsBtn"> <b>Swap here</b></button>
+        <button class="Click-inital-button" id="fetchAccountsBtn"> <b>Swap here</b></button>
     </div>
 
     <!-- Modal for Select Action -->
@@ -232,7 +240,10 @@
             <span class="close">&times;</span>
             <div class="modal-header">
                 <p><b>Select the shifts&#58;</b></p>
-                <input type="text" id="searchBoxShift" placeholder="Search by shift name...">
+                <div class="search-container">
+                    <input type="text" id="searchBoxShift" placeholder="Search by shift name...">
+                    <input type="text" id="searchBoxTemp" placeholder="Search by temp name...">
+                </div>
                 <table id="shiftTable" class="shift-table">
                     <thead>
                         <tr>
@@ -251,6 +262,16 @@
                     <button id="nextShiftPageBtn">Next</button>
                 </div>
                 <button id="submitShiftBtn">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Success Message -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-header">
+                <p id="successMessage"></p>
             </div>
         </div>
     </div>
