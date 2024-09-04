@@ -4,200 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shift Swap</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-        }
+    <link rel="stylesheet" href="shift.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-        .header {
-            text-align: center;
-            padding: 20px;
-            background-color: #fff;
-            border-bottom: 1px solid #ddd;
-        }
-
-        #fetchAccountsBtn {
-            margin-top: 10px;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-            padding-top: 60px;
-            box-sizing: border-box;
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 90%;
-            max-width: 900px;
-            box-sizing: border-box;
-        }
-
-        .modal-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-header button {
-            display: inline-block;
-            margin: 10px 5px;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .radio-container, .shift-container {
-            margin-top: 10px;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-            overflow-y: auto;
-        }
-
-        .radio-container input[type="radio"] {
-            margin-right: 10px;
-        }
-
-        .radio-container label, .shift-row {
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        .pagination {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .pagination button {
-            margin: 0 10px;
-        }
-
-        #searchBox, #searchBoxShift {
-            width: calc(50% - 12px); /* Adjust for padding and spacing */
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        #submitBtn, #submitShiftBtn {
-            display: none;
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        #submitBtn:hover, #submitShiftBtn:hover {
-            background-color: #45a049;
-        }
-
-        .shift-row {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #ddd;
-            padding: 5px 0;
-        }
-
-        .shift-row div {
-            flex: 1;
-            text-align: left;
-        }
-
-        .multi-select-btn {
-            display: block;
-            margin: 10px auto;
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #2196F3;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .multi-select-btn:hover {
-            background-color: #0b79d0;
-        }
-
-        .shift-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        .shift-table th, .shift-table td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: left;
-            word-break: break-word; /* Ensure long text wraps correctly */
-        }
-
-        .shift-table th {
-            color: white;
-            background-color: #277de7;
-        }
-
-        .Click-inital-button {
-            display: block;
-            margin: 10px auto;
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #0771c8;
-            color: rgb(240, 240, 240);
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .Click-inital-button:hover {
-            background-color: #2288e7;
-            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-        }
-
-        .search-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .search-container input[type="text"] {
-            width: calc(50% - 12px); /* Adjust for padding and spacing */
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-    </style>
 </head>
 <body>
     <div class="header">
@@ -213,23 +22,6 @@
                 <p><b>Select Action:</b></p>
                 <button id="swapShiftsBtn" class="multi-select-btn">Swap Shifts</button>
                 <button id="swapTempsBtn" class="multi-select-btn">Swap Temps</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal for Temp Selection -->
-    <div id="tempModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <div class="modal-header">
-                <p><b>Select the temp&#58;</b></p>
-                <input type="text" id="searchBox" placeholder="Search by name...">
-                <div class="radio-container" id="accountRadioContainer"></div>
-                <div class="pagination">
-                    <button id="prevPageBtn">Previous</button>
-                    <button id="nextPageBtn">Next</button>
-                </div>
-                <button id="submitBtn">Submit</button>
             </div>
         </div>
     </div>
@@ -265,6 +57,51 @@
             </div>
         </div>
     </div>
+<!-- Modal for Temp Selection -->
+<div id="tempModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div class="modal-header">
+            <p><b>Select the shifts:</b></p>
+            <div class="search-container">
+                <input type="text" id="searchBoxShifttemp" placeholder="Search by shift name...">
+                <input type="text" id="searchBoxTemptemp" placeholder="Search by temp name...">
+            </div>
+            <table id="shiftTable" class="shift-table">
+                <thead>
+                    <tr>
+                        <th>Shift Name</th>
+                        <th>Temp Name</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Repeat</th>
+                        <th>Select</th>
+                    </tr>
+                </thead>
+                <tbody id="tempshiftContainer"></tbody>
+            </table>
+            <div class="pagination">
+                <button id="prevShiftPageBtn">Previous</button>
+                <button id="nextShiftPageBtn">Next</button>
+            </div>
+            <div id="shiftContainer">
+                <!-- Shift selection content goes here -->
+                <button id="nextButtontemp">Next → Select Temps</button>
+                <div class="modal-header">
+                    <p><b>Select the temp&#58;</b></p>
+                        <input type="text" id="searchBoxTempOnly" placeholder="Search by temp name...">
+                            <div class="radio-container" id="accountRadioContainer"></div>
+                            <div class="pagination">
+                                <button id="prevPageBtn">Previous</button>
+                                <button id="nextPageBtn">Next</button>
+                            </div>
+                        <button id="submitBtn">Submit</button>
+                </div> 
+            </div>
+        </div>
+    </div>
+</div>
+
 
     <!-- Modal for Success Message -->
     <div id="successModal" class="modal">
@@ -279,6 +116,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://live.zwidgets.com/js-sdk/1.2/ZohoEmbededAppSDK.min.js"></script>
-    <script src="shift.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="path/to/your/utility.js"></script>
+    <script src="shift.js" defer></script>
+   
 </body>
 </html>
