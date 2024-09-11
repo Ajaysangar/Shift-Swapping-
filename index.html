@@ -6,7 +6,6 @@
     <title>Shift Swap</title>
     <link rel="stylesheet" href="shift.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
 </head>
 <body>
     <div class="header">
@@ -57,51 +56,38 @@
             </div>
         </div>
     </div>
-<!-- Modal for Temp Selection -->
-<div id="tempModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <div class="modal-header">
-            <p><b>Select the shifts:</b></p>
-            <div class="search-container">
-                <input type="text" id="searchBoxShifttemp" placeholder="Search by shift name...">
-                <input type="text" id="searchBoxTemptemp" placeholder="Search by temp name...">
-            </div>
-            <table id="shiftTable" class="shift-table">
-                <thead>
-                    <tr>
-                        <th>Shift Name</th>
-                        <th>Temp Name</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Repeat</th>
-                        <th>Select</th>
-                    </tr>
-                </thead>
-                <tbody id="tempshiftContainer"></tbody>
-            </table>
-            <div class="pagination">
-                <button id="prevShiftPageBtn">Previous</button>
-                <button id="nextShiftPageBtn">Next</button>
-            </div>
-            <div id="shiftContainer">
-                <!-- Shift selection content goes here -->
+
+    <!-- Modal for Temp Selection -->
+    <div id="tempModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-header">
+                <p><b>Select the Shift to change the temp&#58;</b></p>
+                <div class="search-container">
+                    <input type="text" id="searchBoxShifttemp" placeholder="Search by shift name...">
+                    <input type="text" id="searchBoxTemptemp" placeholder="Search by temp name...">
+                </div>
+                <table id="shiftTable" class="shift-table">
+                    <thead>
+                        <tr>
+                            <th>Shift Name</th>
+                            <th>Temp Name</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Repeat</th>
+                            <th>Select</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tempshiftContainer"></tbody>
+                </table>
+                <div class="pagination">
+                    <button id="prevShiftPageBtn">Previous</button>
+                    <button id="nextShiftPageBtn">Next</button>
+                </div>
                 <button id="nextButtontemp">Next → Select Temps</button>
-                <div class="modal-header">
-                    <p><b>Select the temp&#58;</b></p>
-                        <input type="text" id="searchBoxTempOnly" placeholder="Search by temp name...">
-                            <div class="radio-container" id="accountRadioContainer"></div>
-                            <div class="pagination">
-                                <button id="prevPageBtn">Previous</button>
-                                <button id="nextPageBtn">Next</button>
-                            </div>
-                        <button id="submitBtn">Submit</button>
-                </div> 
             </div>
         </div>
     </div>
-</div>
-
 
     <!-- Modal for Success Message -->
     <div id="successModal" class="modal">
@@ -113,11 +99,45 @@
         </div>
     </div>
 
+  <!-- Placeholder for the new page (Temp Selection) -->
+<!-- Modal HTML -->
+
+<style>
+    /* Ensure the modal is initially hidden */
+    #tempSelectionPage {
+      display: none;
+    }
+  </style>
+  
+  <button id="nextButtontemp">Next</button>
+  <div id="tempSelectionPage" class="modal">
+      <div class="modal-content">
+          <span class="close">&times;</span> <!-- Close button -->
+          <div class="modal-header">
+              <p><b>Select the temp&#58;</b></p>
+          </div>
+          <table id="tempcontainer" class="shift-table">   
+              <thead>
+                  <tr>
+                      <th>Name</th>
+                      <th>Select</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <!-- Rows will be dynamically inserted here -->
+              </tbody>
+          </table>
+          <button id="submitTempSelection" style="display:none;">Submit</button>
+          <div id="paginationControls">
+              <button id="prevButton">Previous</button>
+              <button id="nextButton">Next</button>
+          </div>
+      </div>
+  </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://live.zwidgets.com/js-sdk/1.2/ZohoEmbededAppSDK.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="path/to/your/utility.js"></script>
     <script src="shift.js" defer></script>
    
 </body>
