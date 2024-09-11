@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var selectedShiftIds = [];
     var currentPage = 1;
     var recordsPerPage = 10;
+    const rowsPerPage = 10;
+    const itemsPerPage = 10;
     let maxSelections = 2;
 
     function closeModals() {
@@ -43,6 +45,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (document.getElementById('shiftContainer')) {
             document.getElementById('shiftContainer').innerHTML = '';
+        }
+        if (document.getElementById('tempcontainer')) {
+            document.getElementById('tempcontainer').innerHTML = '';
         }
         
         // Remove event listeners if needed
@@ -76,278 +81,260 @@ document.addEventListener('DOMContentLoaded', function() {
             buttonsModal.style.display = "block"; // Show the buttons modal
         });
     }
-    if (swapTempsBtn) {
-        swapTempsBtn.addEventListener('click', function() {
-            console.log("Swap Temp Shifts button clicked");
-            buttonsModal.style.display = "none"; // Hide the buttons modal
-            tempModal.style.display = "block"; // Show the temp modal
+   
+///////////////////////////
+// Declare a variable to hold the selected shift ID
+let selectedShiftID = '';
+
+if (swapTempsBtn) {
+    swapTempsBtn.addEventListener('click', function () {
+        console.log("Swap Temp Shifts button clicked");
+        buttonsModal.style.display = "none"; // Hide the buttons modal
+        tempModal.style.display = "block"; // Show the temp modal
     
-            ZOHO.CRM.API.getAllRecords({
-                Entity: "Shift_Schedule",
-                sort_order: "asc",
-                per_page: 200
-            }).then(function(response) {
-                console.log("API response received:", response);
+        // Fetch all records from Shift_Schedule
+        ZOHO.CRM.API.getAllRecords({
+            Entity: "Shift_Schedule",
+            sort_order: "asc",
+            per_page: 200
+        }).then(function (response) {
+            console.log("API response received:", response);
     
-                if (response.data && response.data.length > 0) {
-                    tempshiftData = response.data.map(shift => ({
-                        id: shift.id || '',
-                        Name: shift.Name || '',
-                        Start_Date_and_Work_Start_Time: shift.Start_Date_and_Work_Start_Time || '',
-                        End_Date_and_Work_End_Time: shift.End_Date_and_Work_End_Time || '',
-                        Days_in_the_Week: shift.Days_in_the_Week || '',
-                        Schedule_For_Temp: shift.Schedule_For_Temp || {} // Ensure it's an object
-                    }));
+            // Check if response.data is valid
+            if (response.data && response.data.length > 0) {
+                tempshiftData = response.data.map(shift => ({
+                    id: shift.id || '',
+                    Name: shift.Name || '',
+                    Start_Date_and_Work_Start_Time: shift.Start_Date_and_Work_Start_Time || '',
+                    End_Date_and_Work_End_Time: shift.End_Date_and_Work_End_Time || '',
+                    Days_in_the_Week: shift.Days_in_the_Week || '',
+                    Schedule_For_Temp: shift.Schedule_For_Temp || {} // Ensure it's an object
+                }));
+    
+                // Ensure tempshiftData is not undefined
+                if (tempshiftData && tempshiftData.length > 0) {
                     console.log("Temp Shifts data processed:", tempshiftData);
-    
-                    displayshiftTempPage(currentPage);
+                    displayshiftTempPage(currentPage); // Call the function to display shift data
                 } else {
-                    console.log("No temp shift data found");
+                    console.error("Processed temp shift data is empty or undefined");
                 }
-            }).catch(function(error) {
-                console.error("Error fetching temp shift data:", error);
-            });
+            } else {
+                console.log("No temp shift data found");
+            }
+        }).catch(function (error) {
+            console.error("Error fetching temp shift data:", error);
         });
-    }
+    });
+}
+////////////////////////
 
+if (nextButtontemp) {
+    nextButtontemp.addEventListener('click', async function() {
+        buttonsModal.style.display = "none";
+        tempModal.style.display = "block";
 
+        let allTemps = []; // Declare allTemps outside the try block to make it accessible globally
 
-    
+        try {
+            // Fetch all temp records from the "Leads" module
+            const allTempsResponse = await ZOHO.CRM.API.getAllRecords({
+                Entity: "Leads", // The module/entity name where temp data is stored
+                sort_order: "asc", // Sort the data in ascending order
+                per_page: 200 // Number of records per page (adjust as needed)
+            });
 
-    ////////////////////////////////
-    if (nextButtontemp) {
-        nextButtontemp.addEventListener('click', async function() {
-            buttonsModal.style.display = "none";
-            tempModal.style.display = "block";
-    
-            try {
-                // Fetch the details of the specific shift using the Shift ID
-                const shiftID = '6336174000001396001'; // Provided Shift ID
-                const shiftResponse = await ZOHO.CRM.API.getRecord({
-                    Entity: "Shift_Schedule",
-                    RecordID: shiftID
-                });
-    
-                const providedShift = shiftResponse.data[0];
-                const providedShiftStartDate = moment(providedShift['Start_Date_and_Work_Start_Time']);
-                const providedShiftEndDate = moment(providedShift['End_Date_and_Work_End_Time']);
-                const providedShiftDays = providedShift['Days_in_the_Week'].map(day => day.toLowerCase());
-                const providedShiftStartTime = moment(providedShift['Start_Date_and_Work_Start_Time']).format('HH:mm');
-                const providedShiftEndTime = moment(providedShift['End_Date_and_Work_End_Time']).format('HH:mm');
-    
-                // Log the details of the provided shift
-                console.log("Shift provided:", {
-                    id: shiftID,
-                    Start_Date_and_Work_Start_Time: providedShiftStartDate.format('YYYY-MM-DD'),
-                    End_Date_and_Work_End_Time: providedShiftEndDate.format('YYYY-MM-DD'),
-                    Days_in_the_Week: providedShiftDays,
-                    Start_Time: providedShiftStartTime,
-                    End_Time: providedShiftEndTime
-                });
-    
-                // Fetch all shifts
+            // Extract Temp Name and Temp ID from the response
+            allTemps = allTempsResponse.data.map(temp => ({
+                id: temp.id, // Temp ID
+                First_Name: temp.First_Name || 'Unknown', // Ensure first name is included
+                Last_Name: temp.Last_Name || '' // Ensure last name is included
+            }));
+
+            // Log the fetched temp data
+            console.log("Fetched Temp Data:", allTemps);
+
+            // Display the temp data on the page
+            //displayTempdataPage(1, allTemps); // Display the first page of temp data
+
+        } catch (error) {
+            // Handle any errors that occur during the API call
+            console.error("Error fetching temp data:", error);
+        }
+
+        try {
+            // Fetch the details of the specific shift using the Shift ID
+            const shiftID = '6336174000001396001'; // Provided Shift ID
+            const shiftResponse = await ZOHO.CRM.API.getRecord({
+                Entity: "Shift_Schedule",
+                RecordID: shiftID
+            });
+
+            const providedShift = shiftResponse.data[0];
+            const providedShiftStartDate = moment(providedShift['Start_Date_and_Work_Start_Time']);
+            const providedShiftEndDate = moment(providedShift['End_Date_and_Work_End_Time']);
+            const providedShiftDays = providedShift['Days_in_the_Week'].map(day => day.toLowerCase());
+            const providedShiftStartTime = moment(providedShift['Start_Date_and_Work_Start_Time']).format('HH:mm');
+            const providedShiftEndTime = moment(providedShift['End_Date_and_Work_End_Time']).format('HH:mm');
+            const providedTempID = providedShift['Schedule_For_Temp']; // Fetch Temp ID of the provided shift
+
+            // Log the details of the provided shift along with Temp ID
+            console.log("Shift provided:", {
+                id: shiftID,
+                Start_Date_and_Work_Start_Time: providedShiftStartDate.format('YYYY-MM-DD'),
+                End_Date_and_Work_End_Time: providedShiftEndDate.format('YYYY-MM-DD'),
+                Days_in_the_Week: providedShiftDays,
+                Start_Time: providedShiftStartTime,
+                End_Time: providedShiftEndTime,
+                Temp_ID: providedTempID // Log Temp ID
+            });
+
+            // Pagination logic (fetch all shifts in chunks of 200)
+            let page = 1;
+            let allShifts = [];
+            let moreRecords = true;
+
+            while (moreRecords) {
                 const allShiftsResponse = await ZOHO.CRM.API.getAllRecords({
                     Entity: "Shift_Schedule",
                     sort_order: "asc",
+                    page: page,
                     per_page: 200
                 });
-    
-                const allShifts = allShiftsResponse.data;
-    
-                // Filter out the provided shift from all shifts
-                const filteredShifts = allShifts.filter(shift => shift.id !== shiftID);
-    
-                // Function to check if two date ranges overlap
-                function doDatesOverlap(date1, date2) {
-                    const start1 = moment(date1.startDate);
-                    const end1 = moment(date1.endDate);
-                    const start2 = moment(date2.startDate);
-                    const end2 = moment(date2.endDate);
-    
-                    return start1.isBefore(end2) && end1.isAfter(start2);
-                }
-    
-                // Function to check if two shifts overlap
-                function doShiftsOverlap(shift1, shift2) {
-                    const shift1Dates = getWorkingDatesAndTimes(
-                        shift1.startDate,
-                        shift1.endDate,
-                        shift1.startTime,
-                        shift1.endTime,
-                        shift1.workingDays
-                    );
-                    const shift2Dates = getWorkingDatesAndTimes(
-                        shift2.startDate,
-                        shift2.endDate,
-                        shift2.startTime,
-                        shift2.endTime,
-                        shift2.workingDays
-                    );
-    
-                    return shift1Dates.some(date1 => 
-                        shift2Dates.some(date2 => 
-                            date1.date === date2.date && doDatesOverlap(date1, date2)
-                        )
-                    );
-                }
-    
-                // List working dates and times
-                function getWorkingDatesAndTimes(startDate, endDate, startTime, endTime, workingDays) {
-                    let workingDates = [];
-                    let currentDay = moment(startDate);
-                    while (currentDay.isSameOrBefore(endDate)) {
-                        if (isWorkingDay(currentDay, workingDays)) {
-                            workingDates.push({
-                                date: currentDay.format('YYYY-MM-DD'),
-                                startTime: startTime,
-                                endTime: endTime
-                            });
-                        }
-                        currentDay.add(1, 'days');
-                    }
-                    return workingDates;
-                }
-    
-                // Function to check if a date is a working day based on the Days_in_the_Week value
-                function isWorkingDay(date, workingDays) {
-                    const dayOfWeek = date.format('dddd').toLowerCase();
-                    if (workingDays.includes('daily')) return true;
-                    if (workingDays.includes('weekend')) return !['saturday', 'sunday'].includes(dayOfWeek);
-                    return workingDays.includes(dayOfWeek) ||
-                           (workingDays.includes('weekdays') && ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].includes(dayOfWeek));
-                }
-    
-                let providedShiftWorkingDates = getWorkingDatesAndTimes(providedShiftStartDate, providedShiftEndDate, providedShiftStartTime, providedShiftEndTime, providedShiftDays);
-                console.log("Working Dates and Times for Provided Shift:", providedShiftWorkingDates);
-    
-                // Filter shifts that need to be checked and overlap with the provided shift
-                const overlappingShifts = filteredShifts.filter(shift => {
-                    const shiftStart = moment(shift['Start_Date_and_Work_Start_Time']);
-                    const shiftEnd = moment(shift['End_Date_and_Work_End_Time']);
-                    const shiftDays = shift['Days_in_the_Week'].map(day => day.toLowerCase());
-                    const shiftStartTime = moment(shift['Start_Date_and_Work_Start_Time']).format('HH:mm');
-                    const shiftEndTime = moment(shift['End_Date_and_Work_End_Time']).format('HH:mm');
-    
-                    const shiftToCheck = {
-                        startDate: shiftStart.format('YYYY-MM-DD'),
-                        endDate: shiftEnd.format('YYYY-MM-DD'),
-                        workingDays: shiftDays,
-                        startTime: shiftStartTime,
-                        endTime: shiftEndTime
-                    };
-    
-                    const overlap = doShiftsOverlap({
-                        startDate: providedShiftStartDate.format('YYYY-MM-DD'),
-                        endDate: providedShiftEndDate.format('YYYY-MM-DD'),
-                        workingDays: providedShiftDays,
-                        startTime: providedShiftStartTime,
-                        endTime: providedShiftEndTime
-                    }, shiftToCheck);
-    
-                    // Get the working dates and times for this shift
-                    const shiftWorkingDates = getWorkingDatesAndTimes(shiftStart, shiftEnd, shiftStartTime, shiftEndTime, shiftDays);
-    
-                    // Log shift details including ID and working dates
-                    console.log("Checking shift:", {
-                        id: shift.id,
-                        startDate: shiftStart.format('YYYY-MM-DD'),
-                        endDate: shiftEnd.format('YYYY-MM-DD'),
-                        workingDays: shiftDays,
-                        Start_Time: shiftStartTime,
-                        End_Time: shiftEndTime,
-                        Working_Dates_and_Times: shiftWorkingDates,
-                        overlap: overlap
-                    });
-    
-                    return overlap;
-                });
-    
-                // Log shifts that overlap with the provided shift
-                console.log("Overlapping Shifts:");
-                overlappingShifts.forEach(shift => {
-                    const shiftStart = moment(shift['Start_Date_and_Work_Start_Time']);
-                    const shiftEnd = moment(shift['End_Date_and_Work_End_Time']);
-                    const shiftDays = shift['Days_in_the_Week'].map(day => day.toLowerCase());
-                    const shiftStartTime = moment(shift['Start_Date_and_Work_Start_Time']).format('HH:mm');
-                    const shiftEndTime = moment(shift['End_Date_and_Work_End_Time']).format('HH:mm');
-    
-                    // Get the working dates and times for this shift
-                    const shiftWorkingDates = getWorkingDatesAndTimes(shiftStart, shiftEnd, shiftStartTime, shiftEndTime, shiftDays);
-    
-                    console.log({
-                        id: shift.id,
-                        Start_Date_and_Work_Start_Time: shiftStart.format('YYYY-MM-DD'),
-                        End_Date_and_Work_End_Time: shiftEnd.format('YYYY-MM-DD'),
-                        Days_in_the_Week: shiftDays,
-                        Working_Dates_and_Times: shiftWorkingDates
-                    });
-                });
-    
-            } catch (error) {
-                console.error("Error fetching data:", error);
+
+                allShifts = allShifts.concat(allShiftsResponse.data);
+                moreRecords = allShiftsResponse.info.more_records;
+                page++;
             }
-        });
-    } else {
-        console.error("Swap Temps button not found");
-    }
-     
-    
-    
-    
-    
-    
-    
-      
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+            // Filter out the provided shift from all shifts
+            const filteredShifts = allShifts.filter(shift => shift.id !== shiftID);
+
+            // List working dates and times
+            function getWorkingDatesAndTimes(startDate, endDate, startTime, endTime, workingDays) {
+                let workingDates = [];
+                let currentDay = moment(startDate);
+                while (currentDay.isSameOrBefore(endDate)) {
+                    if (isWorkingDay(currentDay, workingDays)) {
+                        workingDates.push({
+                            date: currentDay.format('YYYY-MM-DD'),
+                            startTime: startTime,
+                            endTime: endTime
+                        });
+                    }
+                    currentDay.add(1, 'days');
+                }
+                return workingDates;
+            }
+
+            // Function to check if a date is a working day based on the Days_in_the_Week value
+            function isWorkingDay(date, workingDays) {
+                const dayOfWeek = date.format('dddd').toLowerCase();
+                if (workingDays.includes('daily')) return true;
+                if (workingDays.includes('weekend')) return !['saturday', 'sunday'].includes(dayOfWeek);
+                return workingDays.includes(dayOfWeek) ||
+                    (workingDays.includes('weekdays') && ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].includes(dayOfWeek));
+            }
+
+            let providedShiftWorkingDates = getWorkingDatesAndTimes(providedShiftStartDate, providedShiftEndDate, providedShiftStartTime, providedShiftEndTime, providedShiftDays);
+            console.log("Working Dates and Times for Provided Shift:", providedShiftWorkingDates);
+
+            // Function to check if two shifts overlap based on working dates and times (AND condition for both)
+            function doShiftsOverlap(shift1WorkingDates, shift2WorkingDates) {
+                return shift1WorkingDates.some(shift1Date =>
+                    shift2WorkingDates.some(shift2Date => {
+                        // Check if dates match and if times overlap (AND condition)
+                        return shift1Date.date === shift2Date.date &&
+                            moment(shift1Date.startTime, 'HH:mm').isBefore(moment(shift2Date.endTime, 'HH:mm')) &&
+                            moment(shift1Date.endTime, 'HH:mm').isAfter(moment(shift2Date.startTime, 'HH:mm'));
+                    })
+                );
+            }
+
+            // Filter shifts that need to be checked and overlap with the provided shift
+            const overlappingShifts = filteredShifts.filter(shift => {
+                const shiftStart = moment(shift['Start_Date_and_Work_Start_Time']);
+                const shiftEnd = moment(shift['End_Date_and_Work_End_Time']);
+                const shiftDays = shift['Days_in_the_Week'].map(day => day.toLowerCase());
+                const shiftStartTime = moment(shift['Start_Date_and_Work_Start_Time']).format('HH:mm');
+                const shiftEndTime = moment(shift['End_Date_and_Work_End_Time']).format('HH:mm');
+                const checkingTempID = shift['Schedule_For_Temp']; // Fetch Temp ID of the checking shift
+
+                const shiftWorkingDates = getWorkingDatesAndTimes(shiftStart, shiftEnd, shiftStartTime, shiftEndTime, shiftDays);
+
+                // Check if there are overlapping working dates and times
+                const overlap = doShiftsOverlap(providedShiftWorkingDates, shiftWorkingDates);
+
+                // Log shift details including Temp ID and working dates
+                console.log("Checking shift:", {
+                    id: shift.id,
+                    startDate: shiftStart.format('YYYY-MM-DD'),
+                    endDate: shiftEnd.format('YYYY-MM-DD'),
+                    workingDays: shiftDays,
+                    Start_Time: shiftStartTime,
+                    End_Time: shiftEndTime,
+                    Temp_ID: checkingTempID, // Log Temp ID for checking shift
+                    Working_Dates_and_Times: shiftWorkingDates,
+                    overlap: overlap
+                });
+
+                return overlap;
+            });
+
+            // Log shifts that overlap with the provided shift, including Temp IDs
+            console.log("Overlapping Shifts:");
+            overlappingShifts.forEach(shift => {
+                const shiftStart = moment(shift['Start_Date_and_Work_Start_Time']);
+                const shiftEnd = moment(shift['End_Date_and_Work_End_Time']);
+                const shiftDays = shift['Days_in_the_Week'].map(day => day.toLowerCase());
+                const shiftStartTime = moment(shift['Start_Date_and_Work_Start_Time']).format('HH:mm');
+                const shiftEndTime = moment(shift['End_Date_and_Work_End_Time']).format('HH:mm');
+                const checkingTempID = shift['Schedule_For_Temp'];
+
+                console.log("Overlapping Shift:", {
+                    id: shift.id,
+                    Start_Date_and_Work_Start_Time: shiftStart.format('YYYY-MM-DD'),
+                    End_Date_and_Work_End_Time: shiftEnd.format('YYYY-MM-DD'),
+                    Days_in_the_Week: shiftDays,
+                    Start_Time: shiftStartTime,
+                    End_Time: shiftEndTime,
+                    Temp_ID: checkingTempID // Log Temp ID
+                });
+            });
+
+            // Filter temp list based on overlapping shifts and provided shift Temp ID
+            function getFilteredTempList(allTemps, overlappingTempIDs, providedTempID) {
+                const overlappingTempIDSet = new Set(overlappingTempIDs.map(shift => shift['Schedule_For_Temp']));
+                console.log("Overlapping Temp ID Set:", overlappingTempIDSet);
+
+                // Filter out temps that are in overlapping Temp IDs or the provided shift Temp ID
+                const filteredTemps = allTemps.filter(temp => {
+                    const isExcluded = overlappingTempIDSet.has(temp.id) || temp.id === providedTempID;
+                    if (isExcluded) {
+                        console.log(`Excluded Temp ID: ${temp.id}`);
+                    }
+                    return !isExcluded;
+                });
+
+                console.log("Filtered Temp List:", filteredTemps);
+                return filteredTemps;
+            }
+
+            const finalTempList = getFilteredTempList(allTemps, overlappingShifts, providedTempID);
+            updateTempDisplay(finalTempList); // Update the temp data display on the page
+
+        } catch (error) {
+            console.error("Error fetching shift details:", error);
+        }
+    });
+}
+            
 
     
-        
-    
-    
-    
-    
-    
-    
-       
-    
-    
-
-    
-         
-    
-
-
-
-
-
-
     /////////////////////////////////
+
     // Search function for seaching temp alone page 
 
-    if (document.getElementById('searchBoxTempOnly')) {
-        document.getElementById('searchBoxTempOnly').addEventListener('input', function(event) {
-            const searchQuery = event.target.value.toLowerCase();
-            const filteredData = tempData.filter(temp => 
-                (temp.First_Name + ' ' + temp.Last_Name).toLowerCase().includes(searchQuery)
-            );
-            displayTempdataPage(1, filteredData); // Reset to the first page of filtered results
-        });
-    }
+   
 
 
     // Search function for Swap temps button
@@ -473,12 +460,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Perform swap
                     const tempId1 = shift1.Schedule_For_Temp ? shift1.Schedule_For_Temp.id : null;
                     const tempId2 = shift2.Schedule_For_Temp ? shift2.Schedule_For_Temp.id : null;
+                    tempname1 = shift1.Schedule_For_Temp ? shift1.Schedule_For_Temp.First_Name : null;
+                    tempname2 = shift2.Schedule_For_Temp ? shift2.Schedule_For_Temp.Last_Name : null;
 
                     if (tempId1 === null || tempId2 === null) {
                         showSuccessModal("Both selected shifts must have associated temps.");
                         return;
                     }
-
+                    
+                   
                     // Prepare data for updating
                     const updates = [
                         { id: shift1.id, Schedule_For_Temp: { id: tempId2 } },
@@ -495,7 +485,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             RecordID: update.id,
                             APIData: update
                         }).then(response => {
-                            console.log(`Update response for Shift ID ${update.id}:`, response);
+                            console.log(`Update response for Shift ID ${update.id}: `, response);
                             return response; // Return the response to handle success
                         }).catch(error => {
                             console.error(`Error updating Shift ID ${update.id}:`, error);
@@ -507,7 +497,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }))
                     .then(responses => {
                         console.log("All updates successful:", responses);
-                        showSuccessModal("Shifts Swapped Successfully.");
+                        showSuccessModal( ` Shifts Swapped Successfully.${tempname2}, ${tempname2}` );
                         closeModals();
                     })
                     .catch(function(error) {
@@ -553,8 +543,10 @@ document.addEventListener('DOMContentLoaded', function() {
             displayShiftPage(1, filteredData); // Reset to the first page of filtered results
         });
     }
+ 
 
-    // Fucntion for Swap Temp shift
+    ////////////////////////////////
+    // Function to display shift data -  Swap Temp shift
 
     function displayshiftTempPage(page, data = tempshiftData) {
         const container = document.getElementById('tempshiftContainer');
@@ -610,46 +602,152 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-     // Function to display the temp data
+//////////////////////////
 
-     function displayTempdataPage(page, data = tempData) {
-        const container = document.getElementById('accountRadioContainer');
-        if (!container) {
-            console.error("Radio container element not found");
-            return;
-        }
+// Global variables
+let allTemps = [];
 
-        container.innerHTML = ''; // Clear existing options
-        console.log("Radio container cleared");
+let providedTempID = null; // Initialize providedTempID as null
 
-        const start = (page - 1) * recordsPerPage;
-        const end = start + recordsPerPage;
-        const pagedData = data.slice(start, end);
+// Function to fetch temp data
+function fetchTempData() {
+    return new Promise((resolve) => {
+        allTemps = [
+            
+            // Add more records as needed
+        ];
+        resolve(allTemps);
+    });
+}
 
-        pagedData.forEach(temp => {
-            const label = document.createElement('label');
-            const radio = document.createElement('input');
-            radio.type = 'radio';
-            radio.name = 'account';
-            radio.value = temp.id;
+// Function to filter temp data
+function getFilteredTempList(allTemps, providedTempID) {
+    return allTemps.filter(temp => temp.id !== providedTempID);
+}
 
-            radio.addEventListener('change', function() {
-                selectedRecordId = radio.value;
-                toggleSubmitButtonVisibility();
-            });
+// Function to update the display with paginated data
+function updateTempDisplay(tempData) {
+    const start = (currentPage - 1) * recordsPerPage;
+    const end = start + recordsPerPage;
+    const paginatedData = tempData.slice(start, end);
 
-            const firstName = temp.First_Name || '';
-            const lastName = temp.Last_Name || '';
-            const name = (firstName || lastName) ? (firstName + (firstName && lastName ? ' ' : '') + lastName) : 'Unnamed';
+    const tempContainer = document.getElementById("tempcontainer");
+    tempContainer.innerHTML = ""; // Clear existing rows
 
-            label.appendChild(radio);
-            label.appendChild(document.createTextNode(name + " " + temp.id));
-            container.appendChild(label);
-            container.appendChild(document.createElement('br')); // For better spacing
+    // Create header row
+    const headerRow = document.createElement("tr");
+    const nameHeader = document.createElement("th");
+    nameHeader.innerText = "Name";
+    const selectHeader = document.createElement("th");
+    selectHeader.innerText = "Select";
+    headerRow.appendChild(nameHeader);
+    headerRow.appendChild(selectHeader);
+    tempContainer.appendChild(headerRow);
+
+    // Add temp data rows
+    paginatedData.forEach(temp => {
+        const row = document.createElement("tr");
+
+        const tempNameCell = document.createElement("td");
+        tempNameCell.innerText = `${temp.First_Name || "N/A"} ${temp.Last_Name || ""}`.trim();
+        row.appendChild(tempNameCell);
+
+        const selectCell = document.createElement("td");
+        const radioBtn = document.createElement("input");
+        radioBtn.type = "radio";
+        radioBtn.name = "selectTemp";
+        radioBtn.value = temp.id || "";
+
+        // Show submit button when a temp is selected
+        radioBtn.addEventListener("change", function() {
+            document.getElementById("submitTempSelection").style.display = "block";
+            providedTempID = parseInt(radioBtn.value, 10); // Set the providedTempID when a radio button is selected
         });
 
-        console.log("Radio buttons populated with temp data");
+        selectCell.appendChild(radioBtn);
+        row.appendChild(selectCell);
+
+        tempContainer.appendChild(row);
+    });
+}
+
+// Function to handle pagination
+function handlePagination() {
+    const finalTempList = getFilteredTempList(allTemps, providedTempID);
+    if (finalTempList.length === 0) {
+        document.getElementById("tempcontainer").innerHTML = "<tr><td colspan='2'>No data available</td></tr>";
+        document.getElementById("prevButton").disabled = true;
+        document.getElementById("nextButton").disabled = true;
+        return;
     }
+
+    document.getElementById("prevButton").disabled = currentPage === 1;
+    document.getElementById("nextButton").disabled = (currentPage * recordsPerPage) >= finalTempList.length;
+
+    updateTempDisplay(finalTempList);
+}
+
+// Event listeners for pagination buttons
+document.getElementById("prevButton")?.addEventListener("click", function() {
+    if (currentPage > 1) {
+        currentPage--;
+        handlePagination();
+    }
+});
+
+document.getElementById("nextButton")?.addEventListener("click", function() {
+    const finalTempList = getFilteredTempList(allTemps, providedTempID);
+    if ((currentPage * recordsPerPage) < finalTempList.length) {
+        currentPage++;
+        handlePagination();
+    }
+});
+
+// Function to open the temp selection modal
+function openTempSelectionModal() {
+    fetchTempData().then(() => {
+        const finalTempList = getFilteredTempList(allTemps, providedTempID);
+        handlePagination(); // Ensure pagination and data display are updated
+        
+        var tempModal = document.getElementById("tempSelectionPage");
+        if (tempModal) {
+            tempModal.style.display = "block";
+            document.body.style.overflow = "hidden"; // Prevent scrolling
+            console.log("Modal is now visible");
+        } else {
+            console.error("Modal with ID 'tempSelectionPage' not found.");
+        }
+    });
+}
+
+// Function to close any open modals
+function closeCurrentModal() {
+    var currentModal = document.querySelector(".modal");
+    if (currentModal) {
+        currentModal.style.display = "none";
+    }
+}
+
+// Event listener to open the modal
+document.getElementById("nextButtontemp")?.addEventListener("click", function() {
+    openTempSelectionModal(); // Fetch data and open modal
+});
+
+
+
+
+
+
+
+
+
+    
+
+
+
+    
+
+    ///////////////////////////////////////////
 
     // Fucntion to display shift for Swap Shifts 
 
