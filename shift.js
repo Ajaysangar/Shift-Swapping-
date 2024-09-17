@@ -301,26 +301,56 @@ if (nextButtontemp) {
                 });
             });
 
-            // Filter temp list based on overlapping shifts and provided shift Temp ID
-            function getFilteredTempList(allTemps, overlappingTempIDs, providedTempID) {
-                const overlappingTempIDSet = new Set(overlappingTempIDs.map(shift => shift['Schedule_For_Temp']));
-                console.log("Overlapping Temp ID Set:", overlappingTempIDSet);
 
-                // Filter out temps that are in overlapping Temp IDs or the provided shift Temp ID
-                const filteredTemps = allTemps.filter(temp => {
-                    const isExcluded = overlappingTempIDSet.has(temp.id) || temp.id === providedTempID;
-                    if (isExcluded) {
-                        console.log(`Excluded Temp ID: ${temp.id}`);
-                    }
-                    return !isExcluded;
+            
+            function getFilteredTempList(allTemps, overlappingShifts, providedShift) {
+                // Check if providedShift.Temp_ID exists and has an 'id' property
+                const providedTempID = providedShift.id;
+                
+                // Log the provided shift's Temp ID
+                console.log("Provided Shift Temp ID (String):", providedTempID);
+                
+                // Create a set of Temp IDs from overlapping shifts, ensuring Temp_ID and id exist
+                const overlappingTempIDSet = new Set();
+                overlappingShifts.forEach(shift => {
+                const checkingTempID = shift['Schedule_For_Temp'].id;
+                overlappingTempIDSet.add(checkingTempID); // Add each Temp ID to the set
                 });
-
-                console.log("Filtered Temp List:", filteredTemps);
+                
+                // Log the Temp IDs from overlapping shifts
+                
+                console.log("Overlapping Temp ID Set:", [...overlappingTempIDSet]);
+            
+                
+                // Filter out temps that are in overlapping shifts or have the provided shift Temp ID
+                const filteredTemps = allTemps.filter(temp => {
+                    const tempIDStr = String(temp.id).trim(); // Ensure temp.id is treated as a string and trimmed
+                    
+                    // Log the Temp ID being checked
+                    console.log(`Checking Temp ID: ${tempIDStr}`);
+                    
+                    // Determine if the current temp ID should be excluded
+                    const isExcluded = overlappingTempIDSet.has(tempIDStr) || (providedTempID && tempIDStr === providedTempID);
+                    
+                    // Log the exclusion status and reason
+                    if (isExcluded) {
+                        console.log(`Excluded Temp ID: ${tempIDStr} - Reason: ${overlappingTempIDSet.has(tempIDStr) ? "Overlapping Shift" : "Provided Shift"}`);
+                    } else {
+                        console.log(`Included Temp ID: ${tempIDStr}`);
+                    }
+                    
+                    return !isExcluded; // Include temps that are not excluded
+                });
+                
+                // Log the final filtered temp list
+                console.log("Filtered Temp List (Final):", filteredTemps);
+                
                 return filteredTemps;
             }
+            
 
             const finalTempList = getFilteredTempList(allTemps, overlappingShifts, providedTempID);
-            updateTempDisplay(finalTempList); // Update the temp data display on the page
+           updateTempDisplay(finalTempList); // Display the filtered list
 
         } catch (error) {
             console.error("Error fetching shift details:", error);
@@ -328,6 +358,8 @@ if (nextButtontemp) {
     });
 }
             
+
+
 
     
     /////////////////////////////////
@@ -604,7 +636,7 @@ if (nextButtontemp) {
 
 //////////////////////////
 
-// Global variables
+
 let allTemps = [];
 
 let providedTempID = null; // Initialize providedTempID as null
@@ -671,37 +703,72 @@ function updateTempDisplay(tempData) {
     });
 }
 
+
 // Function to handle pagination
 function handlePagination() {
     const finalTempList = getFilteredTempList(allTemps, providedTempID);
+    const tempContainer = document.getElementById("tempcontainer");
+    const prevButton = document.getElementById("prevButton");
+    const nextButton = document.getElementById("nextButton");
+
+    // Debugging statements
+    console.log("finalTempList length:", finalTempList.length); // Check length of the list
+    console.log("currentPage:", currentPage); // Check current page
+    console.log("recordsPerPage:", recordsPerPage); // Check records per page
+
+    // Display no data message if list is empty
     if (finalTempList.length === 0) {
-        document.getElementById("tempcontainer").innerHTML = "<tr><td colspan='2'>No data available</td></tr>";
-        document.getElementById("prevButton").disabled = true;
-        document.getElementById("nextButton").disabled = true;
+        tempContainer.innerHTML = "<tr><td colspan='2'>No data available</td></tr>";
+        if (prevButton) prevButton.disabled = true;
+        if (nextButton) nextButton.disabled = true;
         return;
     }
 
-    document.getElementById("prevButton").disabled = currentPage === 1;
-    document.getElementById("nextButton").disabled = (currentPage * recordsPerPage) >= finalTempList.length;
+    // Update button states based on current page
+    if (prevButton) {
+        prevButton.disabled = (currentPage === 1);
+        console.log("prevButton.disabled:", prevButton.disabled); // Check if previous button is disabled
+    }
+    if (nextButton) {
+        nextButton.disabled = (currentPage * recordsPerPage >= finalTempList.length);
+        console.log("nextButton.disabled:", nextButton.disabled); // Check if next button is disabled
+    }
 
     updateTempDisplay(finalTempList);
 }
 
 // Event listeners for pagination buttons
-document.getElementById("prevButton")?.addEventListener("click", function() {
-    if (currentPage > 1) {
-        currentPage--;
-        handlePagination();
+document.addEventListener("DOMContentLoaded", function() {
+    const prevButton = document.getElementById("prevButton");
+    const nextButton = document.getElementById("nextButton");
+
+    // Check if buttons are found
+    if (!prevButton || !nextButton) {
+        console.error("Pagination buttons not found");
+        return;
     }
+
+    // Add click event listeners to buttons
+    prevButton.addEventListener("click", function() {
+        if (currentPage > 1) {
+            currentPage--;
+            handlePagination();
+        }
+    });
+
+    nextButton.addEventListener("click", function() {
+        const finalTempList = getFilteredTempList(allTemps, providedTempID);
+        if ((currentPage * recordsPerPage) < finalTempList.length) {
+            currentPage++;
+            handlePagination();
+        }
+    });
+
+    // Initialize pagination on page load
+    handlePagination();
 });
 
-document.getElementById("nextButton")?.addEventListener("click", function() {
-    const finalTempList = getFilteredTempList(allTemps, providedTempID);
-    if ((currentPage * recordsPerPage) < finalTempList.length) {
-        currentPage++;
-        handlePagination();
-    }
-});
+
 
 // Function to open the temp selection modal
 function openTempSelectionModal() {
@@ -736,16 +803,6 @@ document.getElementById("nextButtontemp")?.addEventListener("click", function() 
 
 
 
-
-
-
-
-
-    
-
-
-
-    
 
     ///////////////////////////////////////////
 
