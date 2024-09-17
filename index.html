@@ -108,37 +108,50 @@
       display: none;
     }
   </style>
-  
-  <button id="nextButtontemp">Next</button>
-  <div id="tempSelectionPage" class="modal">
-      <div class="modal-content">
-          <span class="close">&times;</span> <!-- Close button -->
-          <div class="modal-header">
-              <p><b>Select the temp&#58;</b></p>
-          </div>
-          <table id="tempcontainer" class="shift-table">   
-              <thead>
-                  <tr>
-                      <th>Name</th>
-                      <th>Select</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <!-- Rows will be dynamically inserted here -->
-              </tbody>
-          </table>
-          <button id="submitTempSelection" style="display:none;">Submit</button>
-          <div id="paginationControls">
-              <button id="prevButton">Previous</button>
-              <button id="nextButton">Next</button>
-          </div>
-      </div>
-  </div>
+  <!-- Modal for Temp Selection -->
+<div id="tempSelectionPage" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div class="modal-header">
+            <p><b>Select the temp&#58;</b></p>
+        </div>
+        <table id="tempcontainer" class="shift-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Select</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be dynamically inserted here -->
+            </tbody>
+        </table>
+        <div id="paginationControls">
+            <button id="prevButton" class="prevButton">Previous</button>
+            <button id="nextButton" class="nextButton">Next</button>
+        </div>
+        <button id="submitTempSelection" style="display:none;">Submit</button>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://live.zwidgets.com/js-sdk/1.2/ZohoEmbededAppSDK.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="shift.js" defer></script>
-   
+
+    <script src="shift.js"></script>
+    
 </body>
 </html>
