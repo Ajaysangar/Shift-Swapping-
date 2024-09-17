@@ -126,6 +126,8 @@ if (swapTempsBtn) {
         });
     });
 }
+
+
 ////////////////////////
 
 if (nextButtontemp) {
@@ -163,7 +165,7 @@ if (nextButtontemp) {
 
         try {
             // Fetch the details of the specific shift using the Shift ID
-            const shiftID = '6336174000001396001'; // Provided Shift ID
+            const shiftID = selectedShiftID;// Provided Shift ID
             const shiftResponse = await ZOHO.CRM.API.getRecord({
                 Entity: "Shift_Schedule",
                 RecordID: shiftID
@@ -579,6 +581,7 @@ if (nextButtontemp) {
 
     ////////////////////////////////
     // Function to display shift data -  Swap Temp shift
+    
 
     function displayshiftTempPage(page, data = tempshiftData) {
         const container = document.getElementById('tempshiftContainer');
@@ -617,7 +620,6 @@ if (nextButtontemp) {
             radio.addEventListener('change', handleRadioSelection);
         });
         
-        
         console.log("Temp Shift data populated");
     }
     
@@ -628,11 +630,14 @@ if (nextButtontemp) {
         if (nextButtontemp) {
             if (selectedRadio) {
                 nextButtontemp.style.display = 'block'; // Show "Next" button if exactly one radio button is selected
+                selectedShiftID = selectedRadio.value;  // Store the selected shift ID
+                console.log("Selected Shift ID:", selectedShiftID); // Log the selected shift ID
             } else {
                 nextButtontemp.style.display = 'none'; // Hide "Next" button if no radio button is selected
             }
         }
     }
+    
 
 //////////////////////////
 
