@@ -642,16 +642,16 @@ if (nextButtontemp) {
 //////////////////////////
 
 
-let allTemps = [];
 
 let providedTempID = null; // Initialize providedTempID as null
 
 // Function to fetch temp data
 function fetchTempData() {
     return new Promise((resolve) => {
+        // Replace with your actual fetch logic
         allTemps = [
-            
-            // Add more records as needed
+            // Example data, replace with actual data
+           
         ];
         resolve(allTemps);
     });
@@ -708,18 +708,12 @@ function updateTempDisplay(tempData) {
     });
 }
 
-
 // Function to handle pagination
 function handlePagination() {
     const finalTempList = getFilteredTempList(allTemps, providedTempID);
     const tempContainer = document.getElementById("tempcontainer");
     const prevButton = document.getElementById("prevButton");
     const nextButton = document.getElementById("nextButton");
-
-    // Debugging statements
-    console.log("finalTempList length:", finalTempList.length); // Check length of the list
-    console.log("currentPage:", currentPage); // Check current page
-    console.log("recordsPerPage:", recordsPerPage); // Check records per page
 
     // Display no data message if list is empty
     if (finalTempList.length === 0) {
@@ -732,48 +726,67 @@ function handlePagination() {
     // Update button states based on current page
     if (prevButton) {
         prevButton.disabled = (currentPage === 1);
-        console.log("prevButton.disabled:", prevButton.disabled); // Check if previous button is disabled
     }
     if (nextButton) {
         nextButton.disabled = (currentPage * recordsPerPage >= finalTempList.length);
-        console.log("nextButton.disabled:", nextButton.disabled); // Check if next button is disabled
     }
 
     updateTempDisplay(finalTempList);
 }
 
-// Event listeners for pagination buttons
-document.addEventListener("DOMContentLoaded", function() {
-    const prevButton = document.getElementById("prevButton");
-    const nextButton = document.getElementById("nextButton");
-
-    // Check if buttons are found
-    if (!prevButton || !nextButton) {
-        console.error("Pagination buttons not found");
+// Function to toggle the visibility of the submit button
+function toggleSubmitButtonVisibility() {
+    const submitBtn = document.getElementById("submitTempSelection");
+    if (!submitBtn) {
+        console.error("Submit button with ID 'submitTempSelection' not found.");
         return;
     }
 
-    // Add click event listeners to buttons
-    prevButton.addEventListener("click", function() {
-        if (currentPage > 1) {
-            currentPage--;
-            handlePagination();
+    const selectedRadio = document.querySelector('input[name="selectTemp"]:checked');
+    submitBtn.style.display = selectedRadio ? "block" : "none";
+}
+// Function to close the modal and show the previous page
+function closeModals(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) {
+        console.error(`Modal with ID '${modalId}' not found.`);
+        return;
+    }
+
+    modal.style.display = "none";
+    document.body.style.overflow = ""; // Allow scrolling again
+
+    // If it's the tempSelectionPage, reset the page number and update pagination
+    if (modalId === "tempSelectionPage") {
+        currentPage = 1;
+        handlePagination();
+    }
+}
+
+// Function to set up close buttons for all modals
+function setupCloseButtons() {
+    const closeButtons = document.querySelectorAll(".close");
+    closeButtons.forEach(button => {
+        button.addEventListener("click", function() {
+            const modal = this.closest(".modal");
+            if (modal) {
+                const modalId = modal.getAttribute("id");
+                closeModals(modalId);
+            }
+        });
+    });
+}
+
+// To close a modal by clicking outside of it
+window.onclick = function(event) {
+    const modals = document.querySelectorAll(".modal");
+    modals.forEach(modal => {
+        if (event.target === modal) {
+            modal.style.display = "none";
+            document.body.style.overflow = ""; // Allow scrolling again
         }
     });
-
-    nextButton.addEventListener("click", function() {
-        const finalTempList = getFilteredTempList(allTemps, providedTempID);
-        if ((currentPage * recordsPerPage) < finalTempList.length) {
-            currentPage++;
-            handlePagination();
-        }
-    });
-
-    // Initialize pagination on page load
-    handlePagination();
-});
-
-
+};
 
 // Function to open the temp selection modal
 function openTempSelectionModal() {
@@ -781,23 +794,14 @@ function openTempSelectionModal() {
         const finalTempList = getFilteredTempList(allTemps, providedTempID);
         handlePagination(); // Ensure pagination and data display are updated
         
-        var tempModal = document.getElementById("tempSelectionPage");
+        const tempModal = document.getElementById("tempSelectionPage");
         if (tempModal) {
             tempModal.style.display = "block";
             document.body.style.overflow = "hidden"; // Prevent scrolling
-            console.log("Modal is now visible");
         } else {
             console.error("Modal with ID 'tempSelectionPage' not found.");
         }
     });
-}
-
-// Function to close any open modals
-function closeCurrentModal() {
-    var currentModal = document.querySelector(".modal");
-    if (currentModal) {
-        currentModal.style.display = "none";
-    }
 }
 
 // Event listener to open the modal
@@ -805,8 +809,35 @@ document.getElementById("nextButtontemp")?.addEventListener("click", function() 
     openTempSelectionModal(); // Fetch data and open modal
 });
 
+// Event listeners for pagination buttons
+document.addEventListener("DOMContentLoaded", function() {
+    setupCloseButtons(); // Setup close buttons when DOM is ready
 
+    const prevButton = document.getElementById("prevButton");
+    const nextButton = document.getElementById("nextButton");
 
+    if (prevButton) {
+        prevButton.addEventListener("click", function() {
+            if (currentPage > 1) {
+                currentPage--;
+                handlePagination();
+            }
+        });
+    }
+
+    if (nextButton) {
+        nextButton.addEventListener("click", function() {
+            const finalTempList = getFilteredTempList(allTemps, providedTempID);
+            if ((currentPage * recordsPerPage) < finalTempList.length) {
+                currentPage++;
+                handlePagination();
+            }
+        });
+    }
+
+    // Initialize pagination on page load
+    handlePagination();
+});
 
 
     ///////////////////////////////////////////
@@ -885,4 +916,3 @@ document.getElementById("nextButtontemp")?.addEventListener("click", function() 
         console.error("Zoho Embedded App SDK initialization error:", error);
     });
 });
-
