@@ -1,5 +1,4 @@
-window.onload = function() {
-    // Your code her
+
 document.addEventListener('DOMContentLoaded', function() {
     var buttonsModal = document.getElementById('buttonsModal');
     var tempModal = document.getElementById('tempModal');
@@ -955,4 +954,4 @@ function setupCloseButtons() {
         console.error("Zoho Embedded App SDK initialization error:", error);
     });
 });
-};
+
