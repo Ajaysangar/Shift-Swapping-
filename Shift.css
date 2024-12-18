@@ -1,0 +1,246 @@
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background-color: #fff;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #fetchAccountsBtn {
+            margin-top: 10px;
+        }
+        .modal {
+            display: none;  /* Hidden by default */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);  /* Black w/ opacity */
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+        
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header button {
+            display: inline-block;
+            margin: 10px 5px;
+        }
+
+        .radio-container, .shift-container {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            overflow-y: auto;
+        }
+
+        .radio-container input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .radio-container label, .shift-row {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            margin: 0 10px;
+        }
+
+        #searchBoxTempOnly, #searchBoxShift {
+            width: calc(50% - 12px); /* Adjust for padding and spacing */
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        #submitBtn, #submitShiftBtn, #nextButtontemp {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #submitBtn:hover, #submitShiftBtn:hover, #nextButtontemp:hover {
+            background-color: #45a049;
+        }
+
+        .shift-row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+            padding: 5px 0;
+        }
+
+        .shift-row div {
+            flex: 1;
+            text-align: left;
+        }
+
+        .multi-select-btn {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .multi-select-btn:hover {
+            background-color: #0b79d0;
+        }
+
+        .shift-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .shift-table th, .shift-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+            word-break: break-word; /* Ensure long text wraps correctly */
+        }
+
+        .shift-table th {
+            color: white;
+            background-color: #2583f6;
+        }
+
+        .Click-inital-button {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #0771c8;
+            color: rgb(240, 240, 240);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .Click-inital-button:hover {
+            background-color: #2288e7;
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .search-container input[type="text"] {
+            width: calc(50% - 12px); /* Adjust for padding and spacing */
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+    
+   
+    table {
+        width: 100%; /* Full width of the modal content */
+        border-collapse: collapse;
+    }
+    
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+    
+    th {
+        background-color: #f2f2f2;
+        text-align: left;
+    }
+    
+    #submitTempSelection {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        display: none; /* Hidden initially */
+    }
+    
+    #submitTempSelection:hover {
+        background-color: #45a049;
+    }
+
+    #tempSelectionPage {
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5); /* Semi-transparent background */
+        z-index: 1000; /* Ensure modal is above other content */
+    }
+    .shift-table th, .shift-table td {
+        padding: 10px;
+        border: 1px solid #ddd;
+    }
+    .shift-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    /* Existing styles */
+
+
+
