@@ -83,6 +83,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
    
 ///////////////////////////
+// Fucntion to display shifts for Swap Temp
+// Declare a variable to hold the selected shift IDs and set a maximum limit for selections
 // Declare a variable to hold the selected shift ID
 let selectedShiftID = '';
 
@@ -363,6 +365,7 @@ if (nextButtontemp) {
 
 
 
+
     
     /////////////////////////////////
 
@@ -391,21 +394,23 @@ if (nextButtontemp) {
             displayShiftPage(1, filteredData); // Reset to the first page of filtered results
         });
     }
+    /////////////////////////////////
     
-
+    
+    // Fetch and display the shifts
     if (swapShiftsBtn) {
         swapShiftsBtn.addEventListener('click', function() {
             console.log("Swap Shifts button clicked");
             buttonsModal.style.display = "none"; // Hide the buttons modal
             shiftModal.style.display = "block"; // Show the shift modal
-
+    
             ZOHO.CRM.API.getAllRecords({
                 Entity: "Shift_Schedule",
                 sort_order: "asc",
                 per_page: 200
             }).then(function(response) {
                 console.log("API response received:", response);
-
+    
                 if (response.data && response.data.length > 0) {
                     shiftData = response.data.map(shift => ({
                         id: shift.id || '',
@@ -416,8 +421,7 @@ if (nextButtontemp) {
                         Schedule_For_Temp: shift.Schedule_For_Temp || {} // Ensure it's an object
                     }));
                     console.log("Shifts data processed:", shiftData);
-
-                    displayShiftPage(currentPage);
+                    displayShiftPage(currentPage); // Display first page of shifts
                 } else {
                     console.log("No shift data found");
                 }
@@ -425,56 +429,88 @@ if (nextButtontemp) {
                 console.error("Error fetching shift data:", error);
             });
         });
-    } else {
-        console.error("Swap Shifts button not found");
     }
-
-    if (document.getElementById('prevPageBtn')) {
-        document.getElementById('prevPageBtn').addEventListener('click', function() {
-            if (currentPage > 1) {
-                currentPage--;
-                displayshiftTempPage(currentPage);
-            }
-        });
-    } else {
-        console.error("Previous Page button for temp not found");
-    }
-
-    if (document.getElementById('nextPageBtn')) {
-        document.getElementById('nextPageBtn').addEventListener('click', function() {
-            if (currentPage * recordsPerPage < tempData.length) {
-                currentPage++;
-                displayshiftTempPage(currentPage);
-            }
-        });
-    } else {
-        console.error("Next Page button for temp not found");
-    }
-
-    if (document.getElementById('prevShiftPageBtn')) {
-        document.getElementById('prevShiftPageBtn').addEventListener('click', function() {
-            if (currentPage > 1) {
-                currentPage--;
-                displayShiftPage(currentPage);
-            }
-        });
-    } else {
-        console.error("Previous Page button for shift not found");
-    }
-
-    // Function to display the success message modal
-    function showSuccessModal(message) {
-        var successModal = document.getElementById('successModal');
-        var successMessage = document.getElementById('successMessage');
-
-        if (successMessage) {
-            successMessage.textContent = message;
+    
+    // Event listeners for pagination buttons
+    document.getElementById('prevShiftPageBtn').addEventListener('click', function() {
+        if (currentPage > 1) {
+            currentPage--;
+            displayShiftPage(currentPage);
         }
-
-        if (successModal) {
-            successModal.style.display = "block";
+    });
+    
+    document.getElementById('nextShiftPageBtn').addEventListener('click', function() {
+        if (currentPage * recordsPerPage < shiftData.length) {
+            currentPage++;
+            displayShiftPage(currentPage);
         }
+    });
+    
+    // Function to display shifts on the current page
+    function displayShiftPage(page) {
+        const container = document.getElementById('shiftContainer');
+        if (!container) {
+            console.error("Shift container element not found");
+            return;
+        }
+    
+        container.innerHTML = ''; // Clear existing content
+        console.log("Shift container cleared");
+    
+        const start = (page - 1) * recordsPerPage;
+        const end = start + recordsPerPage;
+        const pagedData = shiftData.slice(start, end); // Data for the current page
+    
+        // Populate table rows with shift data
+        pagedData.forEach(shift => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${shift.Name}</td>
+                <td>${shift.Schedule_For_Temp ? shift.Schedule_For_Temp.name : 'N/A'}</td>
+                <td>${shift.Start_Date_and_Work_Start_Time}</td>
+                <td>${shift.End_Date_and_Work_End_Time}</td>
+                <td>${shift.Days_in_the_Week}</td>
+                <td>
+                    <input type="checkbox" name="shift" value="${shift.id}" class="shift-checkbox" />
+                </td>
+            `;
+    
+            container.appendChild(row);
+        });
+    
+        // Attach event listener to shift checkboxes
+        document.querySelectorAll('.shift-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', handleShiftSelection);
+        });
+    
+        console.log("Shift data populated");
     }
+    
+    // Function to handle shift selection
+    function handleShiftSelection(event) {
+        const checkbox = event.target;
+        const shiftId = checkbox.value;
+    
+        if (checkbox.checked) {
+            if (selectedShiftIds.length >= maxSelections) {
+                checkbox.checked = false;
+                alert('You can only select up to two shifts.');
+            } else {
+                selectedShiftIds.push(shiftId);
+            }
+        } else {
+            selectedShiftIds = selectedShiftIds.filter(id => id !== shiftId);
+        }
+    
+        toggleSubmitShiftButtonVisibility();
+    }
+    
+    // Function to toggle the visibility of the submit button
+    function toggleSubmitShiftButtonVisibility() {
+        const submitShiftBtn = document.getElementById('submitShiftBtn');
+        submitShiftBtn.style.display = selectedShiftIds.length === maxSelections ? 'block' : 'none';
+    }
+    ////////////////////////////
 
     // Update the code where you handle the successful shift swap
     if (document.getElementById('submitShiftBtn')) {
@@ -580,25 +616,25 @@ if (nextButtontemp) {
  
 
     ////////////////////////////////
-    // Function to display shift data -  Swap Temp shift
     
-
     function displayshiftTempPage(page, data = tempshiftData) {
         const container = document.getElementById('tempshiftContainer');
         const nextButtontemp = document.getElementById('nextButtontemp');
+        const prevShiftPageBtntemp = document.getElementById('prevShiftPageBtntemp');
+        const nextShiftPageBtntemp = document.getElementById('nextShiftPageBtntemp');
         
         if (!container) {
             console.error("Temp Shift container element not found");
             return;
         }
-        
+    
         container.innerHTML = ''; // Clear existing options
         console.log("Temp Shift container cleared");
-        
+    
         const start = (page - 1) * recordsPerPage;
         const end = start + recordsPerPage;
         const pagedData = data.slice(start, end);
-        
+    
         pagedData.forEach((shift, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -611,27 +647,46 @@ if (nextButtontemp) {
                     <input type="radio" name="shift" value="${shift.id}" class="shift-radio" />
                 </td>
             `;
-            
             container.appendChild(row);
         });
-        
+    
         // Add event listener to handle radio button selection
         document.querySelectorAll('.shift-radio').forEach(radio => {
             radio.addEventListener('change', handleRadioSelection);
         });
-        
+    
         console.log("Temp Shift data populated");
+    
+        // Handle pagination buttons visibility
+        prevShiftPageBtntemp.disabled = page === 1;
+        nextShiftPageBtntemp.disabled = end >= data.length;
     }
     
+    // Event listeners for pagination buttons
+    document.getElementById('prevShiftPageBtntemp').addEventListener('click', function () {
+        if (currentPage > 1) {
+            currentPage--;
+            displayshiftTempPage(currentPage);
+        }
+    });
+    
+    document.getElementById('nextShiftPageBtntemp').addEventListener('click', function () {
+        if (currentPage * recordsPerPage < tempshiftData.length) {
+            currentPage++;
+            displayshiftTempPage(currentPage);
+        }
+    });
+    
+    // Function to handle radio button selection and toggle "Next" button visibility
     function handleRadioSelection(event) {
         const selectedRadio = document.querySelector('.shift-radio:checked');
         const nextButtontemp = document.getElementById('nextButtontemp');
-        
+    
         if (nextButtontemp) {
             if (selectedRadio) {
-                nextButtontemp.style.display = 'block'; // Show "Next" button if exactly one radio button is selected
+                nextButtontemp.style.display = 'block'; // Show "Next" button if a radio button is selected
                 selectedShiftID = selectedRadio.value;  // Store the selected shift ID
-                console.log("Selected Shift ID:", selectedShiftID); // Log the selected shift ID
+                console.log("Selected Shift ID:", selectedShiftID);
             } else {
                 nextButtontemp.style.display = 'none'; // Hide "Next" button if no radio button is selected
             }
@@ -639,19 +694,25 @@ if (nextButtontemp) {
     }
     
 
+
+
+
+    
+
 //////////////////////////
 
-
-
-let providedTempID = null; // Initialize providedTempID as null
+let providedTempID = null; 
+let allTemps = []; // This will be populated by fetchTempData
 
 // Function to fetch temp data
 function fetchTempData() {
     return new Promise((resolve) => {
-        // Replace with your actual fetch logic
+        // Replace with your actual fetch logic or API call
         allTemps = [
-            // Example data, replace with actual data
-           
+            // Example temp data
+            { id: 1, First_Name: 'John', Last_Name: 'Doe' },
+            { id: 2, First_Name: 'Jane', Last_Name: 'Smith' },
+            // Add more temp records as needed for pagination
         ];
         resolve(allTemps);
     });
@@ -660,6 +721,29 @@ function fetchTempData() {
 // Function to filter temp data
 function getFilteredTempList(allTemps, providedTempID) {
     return allTemps.filter(temp => temp.id !== providedTempID);
+}
+
+// Function to handle pagination
+function handlePagination() {
+    const finalTempList = getFilteredTempList(allTemps, providedTempID);
+    const tempContainer = document.getElementById("tempcontainer");
+    const prevButton = document.getElementById("prevButton");
+    const nextButton = document.getElementById("nextButton");
+
+    if (finalTempList.length === 0) {
+        tempContainer.innerHTML = "<tr><td colspan='2'>No data available</td></tr>";
+        if (prevButton) prevButton.disabled = true;
+        if (nextButton) nextButton.disabled = true;
+        return;
+    }
+
+    const totalPages = Math.ceil(finalTempList.length / recordsPerPage);
+
+    // Update button states based on current page
+    if (prevButton) prevButton.disabled = (currentPage === 1);
+    if (nextButton) nextButton.disabled = (currentPage >= totalPages);
+
+    updateTempDisplay(finalTempList);
 }
 
 // Function to update the display with paginated data
@@ -708,44 +792,26 @@ function updateTempDisplay(tempData) {
     });
 }
 
-// Function to handle pagination
-function handlePagination() {
+// Function to navigate to the next page
+function nextPage() {
     const finalTempList = getFilteredTempList(allTemps, providedTempID);
-    const tempContainer = document.getElementById("tempcontainer");
-    const prevButton = document.getElementById("prevButton");
-    const nextButton = document.getElementById("nextButton");
+    const totalPages = Math.ceil(finalTempList.length / recordsPerPage);
 
-    // Display no data message if list is empty
-    if (finalTempList.length === 0) {
-        tempContainer.innerHTML = "<tr><td colspan='2'>No data available</td></tr>";
-        if (prevButton) prevButton.disabled = true;
-        if (nextButton) nextButton.disabled = true;
-        return;
+    if (currentPage < totalPages) {
+        currentPage++;
+        handlePagination();
     }
-
-    // Update button states based on current page
-    if (prevButton) {
-        prevButton.disabled = (currentPage === 1);
-    }
-    if (nextButton) {
-        nextButton.disabled = (currentPage * recordsPerPage >= finalTempList.length);
-    }
-
-    updateTempDisplay(finalTempList);
 }
 
-// Function to toggle the visibility of the submit button
-function toggleSubmitButtonVisibility() {
-    const submitBtn = document.getElementById("submitTempSelection");
-    if (!submitBtn) {
-        console.error("Submit button with ID 'submitTempSelection' not found.");
-        return;
+// Function to navigate to the previous page
+function previousPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        handlePagination();
     }
-
-    const selectedRadio = document.querySelector('input[name="selectTemp"]:checked');
-    submitBtn.style.display = selectedRadio ? "block" : "none";
 }
-// Function to close the modal and show the previous page
+
+// Function to close the modal and reset pagination
 function closeModals(modalId) {
     const modal = document.getElementById(modalId);
     if (!modal) {
@@ -756,14 +822,44 @@ function closeModals(modalId) {
     modal.style.display = "none";
     document.body.style.overflow = ""; // Allow scrolling again
 
-    // If it's the tempSelectionPage, reset the page number and update pagination
+    // If it's the tempSelectionPage, reset the page number
     if (modalId === "tempSelectionPage") {
         currentPage = 1;
         handlePagination();
     }
 }
+function openTempSelectionModal() {
+    try {
+        const tempModal = document.getElementById("tempSelectionPage");
+        if (tempModal) {
+            tempModal.style.display = "block";  // Ensure modal is set to display
+            document.body.style.overflow = "hidden";  // Prevent scrolling
+        } else {
+            console.error("Modal with ID 'tempSelectionPage' not found.");
+        }
+    } catch (error) {
+        console.error("Error opening the modal:", error);
+    }
+}
 
-// Function to set up close buttons for all modals
+
+// Set up event listeners for pagination and close buttons
+document.addEventListener("DOMContentLoaded", function() {
+    const prevButton = document.getElementById("prevButton");
+    const nextButton = document.getElementById("nextButton");
+
+    if (prevButton) {
+        prevButton.addEventListener("click", previousPage);
+    }
+    if (nextButton) {
+        nextButton.addEventListener("click", nextPage);
+    }
+
+    setupCloseButtons(); // Setup close buttons for modal
+    handlePagination(); // Initialize pagination on page load
+});
+
+// Function to set up close buttons
 function setupCloseButtons() {
     const closeButtons = document.querySelectorAll(".close");
     closeButtons.forEach(button => {
@@ -777,70 +873,11 @@ function setupCloseButtons() {
     });
 }
 
-// To close a modal by clicking outside of it
-window.onclick = function(event) {
-    const modals = document.querySelectorAll(".modal");
-    modals.forEach(modal => {
-        if (event.target === modal) {
-            modal.style.display = "none";
-            document.body.style.overflow = ""; // Allow scrolling again
-        }
-    });
-};
-
-// Function to open the temp selection modal
-function openTempSelectionModal() {
-    fetchTempData().then(() => {
-        const finalTempList = getFilteredTempList(allTemps, providedTempID);
-        handlePagination(); // Ensure pagination and data display are updated
-        
-        const tempModal = document.getElementById("tempSelectionPage");
-        if (tempModal) {
-            tempModal.style.display = "block";
-            document.body.style.overflow = "hidden"; // Prevent scrolling
-        } else {
-            console.error("Modal with ID 'tempSelectionPage' not found.");
-        }
-    });
-}
-
-// Event listener to open the modal
-document.getElementById("nextButtontemp")?.addEventListener("click", function() {
-    openTempSelectionModal(); // Fetch data and open modal
-});
-
-// Event listeners for pagination buttons
-document.addEventListener("DOMContentLoaded", function() {
-    setupCloseButtons(); // Setup close buttons when DOM is ready
-
-    const prevButton = document.getElementById("prevButton");
-    const nextButton = document.getElementById("nextButton");
-
-    if (prevButton) {
-        prevButton.addEventListener("click", function() {
-            if (currentPage > 1) {
-                currentPage--;
-                handlePagination();
-            }
-        });
-    }
-
-    if (nextButton) {
-        nextButton.addEventListener("click", function() {
-            const finalTempList = getFilteredTempList(allTemps, providedTempID);
-            if ((currentPage * recordsPerPage) < finalTempList.length) {
-                currentPage++;
-                handlePagination();
-            }
-        });
-    }
-
-    // Initialize pagination on page load
-    handlePagination();
-});
 
 
-    ///////////////////////////////////////////
+
+
+/////////////////////////////////////////////
 
     // Fucntion to display shift for Swap Shifts 
 
